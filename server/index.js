@@ -19,7 +19,7 @@ const io = new Server(httpServer, {
 
 const PORT = Number(process.env.PORT || 3001)
 const CHAT_PHASE_MS = 90000
-const VOTING_PHASE_MS = 30000
+const VOTING_PHASE_MS = 10 * 60 * 1000
 const ROOM_IDLE_MS = 5 * 60 * 1000
 const MIN_PLAYERS = 3
 const rooms = new Map()
