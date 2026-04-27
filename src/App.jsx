@@ -4,7 +4,7 @@ import './App.css'
 
 const emojiReactions = ['\u{1F525}', '\u{1F440}', '\u{1F608}', '\u{1F928}', '\u{1F3AD}']
 const socketServerUrl =
-  import.meta.env.VITE_SERVER_URL || `${window.location.protocol}//${window.location.hostname}:3001`
+  import.meta.env.VITE_API_URL || "http://localhost:3001"
 const sessionStorageKey = 'spy-party-session'
 const nameStorageKey = 'spy-party-name'
 
@@ -28,6 +28,8 @@ function writeSavedSession(session) {
 function createSocket(sessionId) {
   return io(socketServerUrl, {
     autoConnect: false,
+    transports: ["websocket", "polling"],
+    withCredentials: true,
     auth: {
       sessionId,
     },
