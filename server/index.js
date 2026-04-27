@@ -25,52 +25,52 @@ const MIN_PLAYERS = 3
 const rooms = new Map()
 
 const chaosEvents = [
-  'Chaos event: everyone must speak in one word for the next 15 seconds.',
-  'Chaos event: dramatic silence. No talking for the next 10 seconds.',
-  'Chaos event: accuse someone without using their name.',
-  'Chaos event: answer the next question as if you are in a hurry.',
+  'เหตุการณ์ปั่นป่วน: ทุกคนต้องพูดเป็นคำเดียวใน 15 วินาทีถัดไป',
+  'เหตุการณ์ปั่นป่วน: เงียบแบบดราม่า ห้ามพูดใน 10 วินาทีถัดไป',
+  'เหตุการณ์ปั่นป่วน: กล่าวหาใครสักคนโดยห้ามใช้ชื่อของเขา',
+  'เหตุการณ์ปั่นป่วน: ตอบคำถามถัดไปราวกับว่าคุณกำลังรีบ',
 ]
 
 const scenarioPool = [
   {
-    location: 'abandoned spaceship',
-    roles: ['engineer', 'pilot', 'scientist', 'security officer', 'stowaway', 'medic'],
-    hint: 'Something is drifting where it should not exist.',
+    location: 'ยานอวกาศร้าง',
+    roles: ['วิศวกร', 'นักบิน', 'นักวิทยาศาสตร์', 'เจ้าหน้าที่รักษาความปลอดภัย', 'ผู้โดยสารแอบซ่อน', 'แพทย์'],
+    hint: 'มีบางอย่างลอยอยู่ในที่ที่มันไม่ควรมี',
   },
   {
-    location: 'luxury submarine',
-    roles: ['captain', 'chef', 'navigator', 'mechanic', 'tour guide', 'deep sea researcher'],
-    hint: 'The walls groan and everyone pretends that is normal.',
+    location: 'เรือดำน้ำหรู',
+    roles: ['กัปตัน', 'เชฟ', 'ต้นหน', 'ช่างเครื่อง', 'ไกด์นำเที่ยว', 'นักวิจัยใต้ทะเลลึก'],
+    hint: 'ผนังส่งเสียงครางและทุกคนทำเหมือนเป็นเรื่องปกติ',
   },
   {
-    location: 'haunted film set',
-    roles: ['director', 'camera operator', 'makeup artist', 'lead actor', 'stunt coordinator', 'sound designer'],
-    hint: 'Every shadow looks rehearsed until it moves on its own.',
+    location: 'กองถ่ายหนังผีสิง',
+    roles: ['ผู้กำกับ', 'ช่างกล้อง', 'ช่างแต่งหน้า', 'นักแสดงนำ', 'ผู้ประสานงานสตันต์', 'นักออกแบบเสียง'],
+    hint: 'ทุกเงาดูเหมือนถูกซักซ้อมไว้ จนกระทั่งมันขยับเอง',
   },
   {
-    location: 'volcanic spa resort',
-    roles: ['lifeguard', 'massage therapist', 'tourist', 'yoga instructor', 'geologist', 'bartender'],
-    hint: 'Relaxation feels dangerous here.',
+    location: 'สปารีสอร์ตภูเขาไฟ',
+    roles: ['ไลฟ์การ์ด', 'พนักงานนวด', 'นักท่องเที่ยว', 'ครูสอนโยคะ', 'นักธรณีวิทยา', 'บาร์เทนเดอร์'],
+    hint: 'การผ่อนคลายที่นี่ให้ความรู้สึกอันตราย',
   },
   {
-    location: 'floating black market',
-    roles: ['auctioneer', 'bodyguard', 'smuggler', 'collector', 'mechanic', 'lookout'],
-    hint: 'Everything is for sale and nothing is legal.',
+    location: 'ตลาดมืดลอยน้ำ',
+    roles: ['ผู้ประมูล', 'บอดี้การ์ด', 'ผู้ลักลอบขนของ', 'นักสะสม', 'ช่างเครื่อง', 'คนเฝ้าระวัง'],
+    hint: 'ทุกอย่างมีไว้ขาย และไม่มีอะไรถูกกฎหมาย',
   },
   {
-    location: 'time travel airport',
-    roles: ['pilot', 'historian', 'customs agent', 'mechanic', 'tourist', 'timeline inspector'],
-    hint: 'Arrivals and departures are not in the same century.',
+    location: 'สนามบินข้ามเวลา',
+    roles: ['นักบิน', 'นักประวัติศาสตร์', 'เจ้าหน้าที่ศุลกากร', 'ช่างเครื่อง', 'นักท่องเที่ยว', 'ผู้ตรวจสอบเส้นเวลา'],
+    hint: 'เที่ยวบินขาเข้าและขาออกไม่ได้อยู่ในศตวรรษเดียวกัน',
   },
   {
-    location: 'underwater research dome',
-    roles: ['marine biologist', 'dive supervisor', 'robotics specialist', 'doctor', 'intern', 'communications officer'],
-    hint: 'A crack would end the conversation quickly.',
+    location: 'โดมวิจัยใต้น้ำ',
+    roles: ['นักชีววิทยาทางทะเล', 'หัวหน้าควบคุมการดำน้ำ', 'ผู้เชี่ยวชาญหุ่นยนต์', 'แพทย์', 'เด็กฝึกงาน', 'เจ้าหน้าที่สื่อสาร'],
+    hint: 'รอยร้าวเพียงครั้งเดียวอาจจบบทสนทนาได้ทันที',
   },
   {
-    location: 'monster theme park',
-    roles: ['ride operator', 'mascot', 'janitor', 'ticket collector', 'animatronics engineer', 'park manager'],
-    hint: 'The fake screams and real screams are hard to separate.',
+    location: 'สวนสนุกสัตว์ประหลาด',
+    roles: ['พนักงานควบคุมเครื่องเล่น', 'มาสคอต', 'ภารโรง', 'พนักงานเก็บตั๋ว', 'วิศวกรแอนิเมทรอนิกส์', 'ผู้จัดการสวนสนุก'],
+    hint: 'เสียงกรีดร้องปลอมกับของจริงแยกกันได้ยาก',
   },
 ]
 
@@ -280,7 +280,7 @@ function buildPrivateRolePayload(room, player) {
   if (player.isSpy) {
     return {
       roleType: 'spy',
-      message: 'YOU ARE SPY',
+      message: 'คุณคือสปาย',
       hint: room.scenario.hint,
       guessUsed: player.guessedLocation,
       locationOptions: allLocations,
@@ -339,23 +339,23 @@ function createResultFromVotes(room) {
 
   return {
     winningTeam: civiliansWin ? 'civilians' : 'spy',
-    victoryType: civiliansWin ? 'vote-correct' : tie ? 'vote-tie' : 'vote-wrong',
+    victoryType: civiliansWin ? 'โหวตถูกต้อง' : tie ? 'โหวตเสมอ' : 'โหวตผิดคน',
     spyId: spy?.id || null,
-    spyName: spy?.name || 'Unknown',
+    spyName: spy?.name || 'ไม่ทราบ',
     accusedId: accusedPlayer?.id || null,
-    accusedName: accusedPlayer?.name || 'No one',
-    location: room.scenario?.location || 'Unknown',
+    accusedName: accusedPlayer?.name || 'ไม่มีใคร',
+    location: room.scenario?.location || 'ไม่ทราบ',
     hint: room.scenario?.hint || '',
     roles: room.players.map((player) => ({
       id: player.id,
       name: player.name,
-      role: player.isSpy ? 'SPY' : player.role,
+      role: player.isSpy ? 'สปาย' : player.role,
       isSpy: player.isSpy,
     })),
     votes: room.votes,
     summary: civiliansWin
-      ? `The civilians exposed ${spy?.name || 'the spy'}.`
-      : `${spy?.name || 'The spy'} escaped suspicion.`,
+      ? `ฝ่ายพลเรือนเปิดโปง ${spy?.name || 'สปาย'} ได้สำเร็จ`
+      : `${spy?.name || 'สปาย'} หลบหนีความสงสัยไปได้`,
   }
 }
 
@@ -376,8 +376,8 @@ function beginVoting(room) {
   room.timerEndsAt = Date.now() + VOTING_PHASE_MS
   room.messages.push({
     id: `system-${Date.now()}`,
-    sender: 'SYSTEM',
-    text: 'Voting has started. Pick the player you think is the spy.',
+    sender: 'ระบบ',
+    text: 'เริ่มการลงคะแนนแล้ว เลือกผู้เล่นที่คุณคิดว่าเป็นสปาย',
     type: 'system',
     createdAt: Date.now(),
   })
@@ -392,8 +392,8 @@ function resetRoundState(room) {
   room.messages = [
     {
       id: `system-${Date.now()}`,
-      sender: 'SYSTEM',
-      text: 'Round started. Blend in, interrogate, and stay sharp.',
+      sender: 'ระบบ',
+      text: 'รอบเริ่มแล้ว จงกลมกลืน สอบสวน และมีไหวพริบไว้',
       type: 'system',
       createdAt: Date.now(),
     },
@@ -411,18 +411,18 @@ function resetRoundState(room) {
 
   room.players.forEach((player, index) => {
     player.isSpy = index === spyIndex
-    player.role = player.isSpy ? null : room.scenario.roles[civilianIndex++] || 'observer'
+    player.role = player.isSpy ? null : room.scenario.roles[civilianIndex++] || 'ผู้สังเกตการณ์'
     player.guessedLocation = false
   })
 }
 
 function startRound(room) {
   if (room.players.length < MIN_PLAYERS) {
-    throw new Error(`At least ${MIN_PLAYERS} players are required.`)
+    throw new Error(`ต้องมีผู้เล่นอย่างน้อย ${MIN_PLAYERS} คน`)
   }
 
   if (connectedPlayers(room).length !== room.players.length) {
-    throw new Error('All players must be connected before starting the round.')
+    throw new Error('ผู้เล่นทุกคนต้องเชื่อมต่ออยู่ก่อนเริ่มรอบ')
   }
 
   resetRoundState(room)
@@ -431,7 +431,7 @@ function startRound(room) {
 
   room.messages.push({
     id: `system-chaos-${Date.now()}`,
-    sender: 'CHAOS',
+    sender: 'ปั่นป่วน',
     text: room.chaosEvent,
     type: 'chaos',
     createdAt: Date.now(),
@@ -480,7 +480,7 @@ app.get('/api/health', (_req, res) => {
 app.get('/', (_req, res) => {
   res.json({
     ok: true,
-    message: 'Spy Party API Running'
+    message: 'ระบบ Spy Party API กำลังทำงาน'
   })
 })
 
@@ -507,12 +507,12 @@ io.on('connection', (socket) => {
       const trimmedName = playerName?.trim()
 
       if (!trimmedName) {
-        throw new Error('Player name is required.')
+        throw new Error('ต้องระบุชื่อผู้เล่น')
       }
 
       const existing = getPlayerBySocket(socket)
       if (existing.room) {
-        throw new Error('You are already in a room.')
+        throw new Error('คุณอยู่ในห้องแล้ว')
       }
 
       const hostPlayer = createPlayer({
@@ -542,24 +542,24 @@ io.on('connection', (socket) => {
       const trimmedName = playerName?.trim()
 
       if (!room) {
-        throw new Error('Room not found.')
+        throw new Error('ไม่พบห้อง')
       }
 
       if (!trimmedName) {
-        throw new Error('Player name is required.')
+        throw new Error('ต้องระบุชื่อผู้เล่น')
       }
 
       const existing = getPlayerBySocket(socket)
       if (existing.room) {
-        throw new Error('You are already in a room.')
+        throw new Error('คุณอยู่ในห้องแล้ว')
       }
 
       if (room.phase !== 'lobby') {
-        throw new Error('This room is already in a game.')
+        throw new Error('ห้องนี้อยู่ระหว่างการเล่นแล้ว')
       }
 
       if (room.players.some((player) => player.name.toLowerCase() === trimmedName.toLowerCase())) {
-        throw new Error('That name is already taken in this room.')
+        throw new Error('ชื่อนี้ถูกใช้ในห้องนี้แล้ว')
       }
 
       const player = createPlayer({
@@ -587,15 +587,15 @@ io.on('connection', (socket) => {
       const { player } = getPlayerBySocket(socket)
 
       if (!room || !player) {
-        throw new Error('Room not found.')
+        throw new Error('ไม่พบห้อง')
       }
 
       if (room.hostId !== player.id) {
-        throw new Error('Only the host can start the game.')
+        throw new Error('มีเพียงหัวหน้าห้องเท่านั้นที่เริ่มเกมได้')
       }
 
       if (room.phase !== 'lobby') {
-        throw new Error('The game has already started.')
+        throw new Error('เกมได้เริ่มไปแล้ว')
       }
 
       startRound(room)
@@ -611,15 +611,15 @@ io.on('connection', (socket) => {
       const { player } = getPlayerBySocket(socket)
 
       if (!room || !player) {
-        throw new Error('Room not found.')
+        throw new Error('ไม่พบห้อง')
       }
 
       if (room.hostId !== player.id) {
-        throw new Error('Only the host can start the next round.')
+        throw new Error('มีเพียงหัวหน้าห้องเท่านั้นที่เริ่มรอบถัดไปได้')
       }
 
       if (room.phase !== 'result') {
-        throw new Error('The round is not over yet.')
+        throw new Error('รอบนี้ยังไม่จบ')
       }
 
       startRound(room)
@@ -635,16 +635,16 @@ io.on('connection', (socket) => {
       const { player } = getPlayerBySocket(socket)
 
       if (!room || !player) {
-        throw new Error('Room not found.')
+        throw new Error('ไม่พบห้อง')
       }
 
       if (room.phase !== 'chat') {
-        throw new Error('Chat is only available during the chat phase.')
+        throw new Error('แชตใช้ได้เฉพาะในช่วงสนทนาเท่านั้น')
       }
 
       const text = message?.trim()
       if (!text && !reaction) {
-        throw new Error('Message cannot be empty.')
+        throw new Error('ข้อความต้องไม่ว่างเปล่า')
       }
 
       const payload = {
@@ -672,23 +672,23 @@ io.on('connection', (socket) => {
       const { player } = getPlayerBySocket(socket)
 
       if (!room || !player) {
-        throw new Error('Room not found.')
+        throw new Error('ไม่พบห้อง')
       }
 
       if (room.phase !== 'chat') {
-        throw new Error('Location guesses are only allowed during the chat phase.')
+        throw new Error('การทายสถานที่ทำได้เฉพาะในช่วงสนทนาเท่านั้น')
       }
 
       if (!player.isSpy) {
-        throw new Error('Only the spy can guess the location.')
+        throw new Error('มีเพียงสปายเท่านั้นที่ทายสถานที่ได้')
       }
 
       if (player.guessedLocation) {
-        throw new Error('The spy has already used the location guess.')
+        throw new Error('สปายใช้สิทธิ์ทายสถานที่ไปแล้ว')
       }
 
       if (!allLocations.includes(location)) {
-        throw new Error('Invalid location guess.')
+        throw new Error('การทายสถานที่ไม่ถูกต้อง')
       }
 
       player.guessedLocation = true
@@ -698,22 +698,22 @@ io.on('connection', (socket) => {
       if (normalizeLocation(location) === normalizeLocation(room.scenario?.location)) {
         revealResult(room, {
           winningTeam: 'spy',
-          victoryType: 'spy-guess-correct',
+          victoryType: 'สปายทายถูก',
           spyId: player.id,
           spyName: player.name,
           accusedId: null,
-          accusedName: 'No accusation',
+          accusedName: 'ไม่มีการกล่าวหา',
           location: room.scenario.location,
           hint: room.scenario.hint,
           roles: room.players.map((entry) => ({
             id: entry.id,
             name: entry.name,
-            role: entry.isSpy ? 'SPY' : entry.role,
+            role: entry.isSpy ? 'สปาย' : entry.role,
             isSpy: entry.isSpy,
           })),
           votes: room.votes,
           guessedLocation: location,
-          summary: `${player.name} guessed the hidden location and stole the round.`,
+          summary: `${player.name} ทายสถานที่ลับถูกและขโมยรอบนี้ไปได้`,
         })
         callback({ ok: true, correct: true })
         return
@@ -722,7 +722,7 @@ io.on('connection', (socket) => {
       callback({
         ok: true,
         correct: false,
-        message: 'Wrong guess. The round continues, but the spy cannot guess again.',
+        message: 'ทายผิด รอบยังดำเนินต่อไป แต่สปายจะทายอีกไม่ได้',
       })
     } catch (error) {
       callback({ ok: false, error: error.message })
@@ -735,15 +735,15 @@ io.on('connection', (socket) => {
       const { player } = getPlayerBySocket(socket)
 
       if (!room || !player) {
-        throw new Error('Room not found.')
+        throw new Error('ไม่พบห้อง')
       }
 
       if (room.phase !== 'voting') {
-        throw new Error('Voting is not active.')
+        throw new Error('ยังไม่อยู่ในช่วงลงคะแนน')
       }
 
       if (!room.players.some((entry) => entry.id === targetId)) {
-        throw new Error('Invalid vote target.')
+        throw new Error('เป้าหมายการโหวตไม่ถูกต้อง')
       }
 
       room.votes[player.id] = targetId
@@ -766,15 +766,15 @@ io.on('connection', (socket) => {
       const { player } = getPlayerBySocket(socket)
 
       if (!room || !player) {
-        throw new Error('Room not found.')
+        throw new Error('ไม่พบห้อง')
       }
 
       if (room.hostId !== player.id) {
-        throw new Error('Only the host can reveal the result early.')
+        throw new Error('มีเพียงหัวหน้าห้องเท่านั้นที่เฉลยผลก่อนเวลาได้')
       }
 
       if (room.phase !== 'voting') {
-        throw new Error('The round is not in voting.')
+        throw new Error('รอบนี้ไม่ได้อยู่ในช่วงลงคะแนน')
       }
 
       revealResult(room)
@@ -825,5 +825,5 @@ io.on('connection', (socket) => {
 })
 
 httpServer.listen(PORT, () => {
-  console.log(`Spy Party Chaos server listening on http://localhost:${PORT}`)
+  console.log(`เซิร์ฟเวอร์ Spy Party Chaos กำลังฟังอยู่ที่ http://localhost:${PORT}`)
 })

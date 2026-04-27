@@ -49,18 +49,18 @@ function formatTimeRemaining(timerEndsAt) {
 
 function phaseLabel(phase) {
   if (phase === 'chat') {
-    return 'Interrogation'
+    return 'สอบสวน'
   }
 
   if (phase === 'voting') {
-    return 'Voting'
+    return 'ลงคะแนน'
   }
 
   if (phase === 'result') {
-    return 'Reveal'
+    return 'เฉลย'
   }
 
-  return 'Lobby'
+  return 'ล็อบบี้'
 }
 
 function App() {
@@ -77,7 +77,7 @@ function App() {
   const [result, setResult] = useState(null)
   const [chatMessage, setChatMessage] = useState('')
   const [feedback, setFeedback] = useState(
-    initialSession?.roomCode ? 'Trying to restore your session...' : '',
+    initialSession?.roomCode ? 'กำลังพยายามกู้คืนเซสชันของคุณ...' : '',
   )
   const [busyAction, setBusyAction] = useState('')
   const [tick, setTick] = useState(0)
@@ -97,7 +97,7 @@ function App() {
 
     const onDisconnect = () => {
       setSocketReady(false)
-      setFeedback('Connection lost. We will restore your room automatically when the socket reconnects.')
+      setFeedback('การเชื่อมต่อขาดหาย ระบบจะกู้คืนห้องของคุณอัตโนมัติเมื่อเชื่อมต่อใหม่')
     }
 
     socket.on('connect', onConnect)
@@ -113,7 +113,7 @@ function App() {
         playerId: payload.playerId,
         sessionId: payload.sessionId,
       })
-      setFeedback(`Rejoined room ${payload.roomCode}.`)
+      setFeedback(`กลับเข้าห้อง ${payload.roomCode} อีกครั้งแล้ว`)
     })
     socket.on('roomState', (nextRoomState) => {
       setRoomState(nextRoomState)
@@ -179,7 +179,7 @@ function App() {
       socketRef.current.emit(eventName, payload, (response) => {
         setBusyAction('')
         if (!response?.ok) {
-          setFeedback(response?.error || 'Action failed.')
+          setFeedback(response?.error || 'การดำเนินการล้มเหลว')
         }
         resolve(response)
       })
@@ -188,13 +188,13 @@ function App() {
 
   async function handleCreateRoom() {
     if (!playerName.trim()) {
-      setFeedback('Enter your player name first.')
+      setFeedback('กรอกชื่อผู้เล่นของคุณก่อน')
       return
     }
 
     setPrivateRole(null)
     setResult(null)
-    const response = await runAckEvent('createRoom', { playerName }, 'Creating room')
+    const response = await runAckEvent('createRoom', { playerName }, 'กำลังสร้างห้อง')
     if (response?.ok) {
       setPlayerId(response.playerId)
       setSessionId(response.sessionId)
@@ -205,12 +205,12 @@ function App() {
 
   async function handleJoinRoom() {
     if (!playerName.trim()) {
-      setFeedback('Enter your player name first.')
+      setFeedback('กรอกชื่อผู้เล่นของคุณก่อน')
       return
     }
 
     if (!roomCodeInput.trim()) {
-      setFeedback('Enter a room code.')
+      setFeedback('กรอกรหัสห้อง')
       return
     }
 
@@ -219,7 +219,7 @@ function App() {
     const response = await runAckEvent(
       'joinRoom',
       { playerName, roomCode: roomCodeInput.toUpperCase() },
-      'Joining room',
+      'กำลังเข้าห้อง',
     )
     if (response?.ok) {
       setPlayerId(response.playerId)
@@ -230,13 +230,13 @@ function App() {
   }
 
   async function handleStartGame() {
-    await runAckEvent('startGame', { roomCode }, 'Starting game')
+    await runAckEvent('startGame', { roomCode }, 'กำลังเริ่มเกม')
   }
 
   async function handleNextRound() {
     setPrivateRole(null)
     setResult(null)
-    await runAckEvent('nextRound', { roomCode }, 'Starting next round')
+    await runAckEvent('nextRound', { roomCode }, 'กำลังเริ่มรอบถัดไป')
   }
 
   async function handleSendMessage(event) {
@@ -249,7 +249,7 @@ function App() {
     const response = await runAckEvent(
       'sendMessage',
       { roomCode, message: chatMessage },
-      'Sending message',
+      'กำลังส่งข้อความ',
     )
 
     if (response?.ok) {
@@ -258,22 +258,22 @@ function App() {
   }
 
   async function handleReaction(reaction) {
-    await runAckEvent('sendMessage', { roomCode, reaction }, 'Sending reaction')
+    await runAckEvent('sendMessage', { roomCode, reaction }, 'กำลังส่งรีแอ็กชัน')
   }
 
   async function handleVote(targetId) {
-    await runAckEvent('votePlayer', { roomCode, targetId }, 'Casting vote')
+    await runAckEvent('votePlayer', { roomCode, targetId }, 'กำลังลงคะแนน')
   }
 
   async function handleRevealEarly() {
-    await runAckEvent('revealResult', { roomCode }, 'Revealing result')
+    await runAckEvent('revealResult', { roomCode }, 'กำลังเฉลยผล')
   }
 
   async function handleGuessLocation(location) {
     const response = await runAckEvent(
       'guessLocation',
       { roomCode, location },
-      'Guessing location',
+      'กำลังทายสถานที่',
     )
 
     if (!response?.ok) {
@@ -281,16 +281,16 @@ function App() {
     }
 
     if (response.correct) {
-      setFeedback('Correct guess. The spy stole the round.')
+      setFeedback('ทายถูก สปายขโมยรอบนี้ไปได้')
       return
     }
 
     setGuessModalOpen(false)
-    setFeedback(response.message || 'Wrong guess. The round continues.')
+    setFeedback(response.message || 'ทายผิด รอบยังดำเนินต่อไป')
   }
 
   async function handleLeaveRoom() {
-    await runAckEvent('leaveRoom', {}, 'Leaving room')
+    await runAckEvent('leaveRoom', {}, 'กำลังออกจากห้อง')
     setRoomCode('')
     setRoomCodeInput('')
     setPlayerId('')
@@ -311,17 +311,17 @@ function App() {
       <section className="panel hero-panel">
         <div className="status-row">
           <span className={`status-pill ${socketReady ? 'online' : 'offline'}`}>
-            {socketReady ? 'LIVE' : 'OFFLINE'}
+            {socketReady ? 'ออนไลน์' : 'ออฟไลน์'}
           </span>
           <span className="status-pill ghost">Spy Party Chaos</span>
-          {isInRoom && <span className="status-pill highlight">Room {roomCode}</span>}
+          {isInRoom && <span className="status-pill highlight">ห้อง {roomCode}</span>}
         </div>
 
         <div className="title-wrap">
-          <p className="eyebrow">Real-time social deduction</p>
+          <p className="eyebrow">เกมจับพิรุธแบบเรียลไทม์</p>
           <h1>Spy Party Chaos</h1>
           <p className="subtitle">
-            One spy. One room. Everyone talks. The wrong accusation hands the round to the infiltrator.
+            หนึ่งสปาย หนึ่งห้อง ทุกคนพูดคุย หากกล่าวหาผิด รอบนี้จะตกเป็นของผู้แทรกซึม
           </p>
         </div>
 
@@ -331,24 +331,24 @@ function App() {
           <div className="home-grid">
             <section className="card">
               <label className="field-label" htmlFor="player-name">
-                Codename
+                โค้ดเนม
               </label>
               <input
                 id="player-name"
                 className="input"
                 value={playerName}
                 onChange={(event) => setPlayerName(event.target.value)}
-                placeholder="Agent Neon"
+                placeholder="เอเจนต์นีออน"
                 maxLength={18}
               />
               <button className="primary-button" onClick={handleCreateRoom} disabled={busyAction !== ''}>
-                {busyAction === 'Creating room' ? 'Creating...' : 'Create Room'}
+                {busyAction === 'กำลังสร้างห้อง' ? 'กำลังสร้าง...' : 'สร้างห้อง'}
               </button>
             </section>
 
             <section className="card">
               <label className="field-label" htmlFor="room-code">
-                Room Code
+                รหัสห้อง
               </label>
               <input
                 id="room-code"
@@ -359,7 +359,7 @@ function App() {
                 maxLength={5}
               />
               <button className="secondary-button" onClick={handleJoinRoom} disabled={busyAction !== ''}>
-                {busyAction === 'Joining room' ? 'Joining...' : 'Join Room'}
+                {busyAction === 'กำลังเข้าห้อง' ? 'กำลังเข้า...' : 'เข้าห้อง'}
               </button>
             </section>
           </div>
@@ -370,37 +370,37 @@ function App() {
             <section className="card spotlight-card">
               <div className="section-heading">
                 <div>
-                  <p className="mini-label">Phase</p>
+                  <p className="mini-label">ช่วง</p>
                   <h2>{phaseLabel(phase)}</h2>
                 </div>
                 <div className="clock-box">
-                  <span>Timer</span>
+                  <span>เวลา</span>
                   <strong key={tick}>{phase === 'lobby' ? '--' : timeRemaining}</strong>
                 </div>
               </div>
 
               {phase === 'lobby' && (
                 <div className="role-panel neutral">
-                  <p>Share room code <strong>{roomCode}</strong> and wait for the host to launch the round.</p>
+                  <p>แชร์รหัสห้อง <strong>{roomCode}</strong> แล้วรอหัวหน้าห้องเริ่มรอบ</p>
                   <p className="helper-text">
-                    Minimum players: 3. Everyone must be connected before a round can start.
+                    ผู้เล่นขั้นต่ำ: 3 คน ทุกคนต้องเชื่อมต่ออยู่ก่อนเริ่มรอบ
                   </p>
                 </div>
               )}
 
               {phase !== 'lobby' && privateRole?.roleType === 'spy' && (
                 <div className="role-panel spy">
-                  <p className="role-badge">YOU ARE SPY</p>
-                  <h3>Blend in and steal the truth.</h3>
-                  <p>You do not know the location or assigned roles.</p>
-                  <p className="hint-line">Hint: {privateRole.hint}</p>
+                  <p className="role-badge">คุณคือสปาย</p>
+                  <h3>กลมกลืนและขโมยความจริงไป</h3>
+                  <p>คุณไม่รู้สถานที่หรือบทบาทที่ถูกแจก</p>
+                  <p className="hint-line">คำใบ้: {privateRole.hint}</p>
                   <div className="action-cluster">
                     <button
                       className="secondary-button compact-button"
                       onClick={() => setGuessModalOpen(true)}
                       disabled={!canGuessLocation || busyAction !== ''}
                     >
-                      {privateRole?.guessUsed ? 'Guess Used' : 'Guess Location'}
+                      {privateRole?.guessUsed ? 'ใช้สิทธิ์ทายแล้ว' : 'ทายสถานที่'}
                     </button>
                   </div>
                 </div>
@@ -408,32 +408,32 @@ function App() {
 
               {phase !== 'lobby' && privateRole?.roleType === 'civilian' && (
                 <div className="role-panel civilian">
-                  <p className="role-badge">CIVILIAN</p>
+                  <p className="role-badge">พลเรือน</p>
                   <h3>{privateRole.location}</h3>
-                  <p>Your role is <strong>{privateRole.role}</strong>.</p>
-                  <p className="hint-line">Hint: {privateRole.hint}</p>
+                  <p>บทบาทของคุณคือ <strong>{privateRole.role}</strong></p>
+                  <p className="hint-line">คำใบ้: {privateRole.hint}</p>
                 </div>
               )}
 
               {roomState.chaosEvent && phase === 'chat' && (
                 <div className="chaos-card">
-                  <span>Chaos Event</span>
+                  <span>เหตุการณ์ปั่นป่วน</span>
                   <p>{roomState.chaosEvent}</p>
                 </div>
               )}
 
               {phase === 'lobby' && (
                 <button className="primary-button" onClick={handleStartGame} disabled={!canStart || busyAction !== ''}>
-                  {busyAction === 'Starting game' ? 'Starting...' : isHost ? 'Start Game' : 'Waiting for Host'}
+                  {busyAction === 'กำลังเริ่มเกม' ? 'กำลังเริ่ม...' : isHost ? 'เริ่มเกม' : 'กำลังรอหัวหน้าห้อง'}
                 </button>
               )}
 
               {phase === 'voting' && (
                 <div className="vote-instructions">
-                  <p>Tap the player you think is the spy. Votes reveal automatically when everyone has voted.</p>
+                  <p>แตะผู้เล่นที่คุณคิดว่าเป็นสปาย ระบบจะเฉลยอัตโนมัติเมื่อทุกคนลงคะแนนแล้ว</p>
                   <p className="helper-text">
-                    {roomState.voteCount}/{players.length} votes locked in.
-                    {myVote ? ' Your vote is in.' : ' You still need to vote.'}
+                    ลงคะแนนแล้ว {roomState.voteCount}/{players.length} เสียง
+                    {myVote ? ' คุณลงคะแนนแล้ว' : ' คุณยังต้องลงคะแนน'}
                   </p>
                 </div>
               )}
@@ -441,45 +441,45 @@ function App() {
               {phase === 'result' && result && (
                 <div className="result-card elevated">
                   <p className={`result-badge ${result.winningTeam}`}>
-                    {result.winningTeam === 'civilians' ? 'Civilians Win' : 'Spy Wins'}
+                    {result.winningTeam === 'civilians' ? 'พลเรือนชนะ' : 'สปายชนะ'}
                   </p>
                   <h3>{result.summary}</h3>
                   <div className="result-grid">
                     <div>
-                      <span className="mini-label">Spy</span>
+                      <span className="mini-label">สปาย</span>
                       <p><strong>{result.spyName}</strong></p>
                     </div>
                     <div>
-                      <span className="mini-label">Location</span>
+                      <span className="mini-label">สถานที่</span>
                       <p><strong>{result.location}</strong></p>
                     </div>
                     <div>
-                      <span className="mini-label">Accused</span>
+                      <span className="mini-label">ผู้ถูกกล่าวหา</span>
                       <p><strong>{result.accusedName}</strong></p>
                     </div>
                     <div>
-                      <span className="mini-label">Victory</span>
+                      <span className="mini-label">ชัยชนะ</span>
                       <p><strong>{result.victoryType}</strong></p>
                     </div>
                   </div>
                   {result.guessedLocation && (
-                    <p className="helper-text">Spy guessed: {result.guessedLocation}</p>
+                    <p className="helper-text">สปายทายว่า: {result.guessedLocation}</p>
                   )}
-                  <p className="helper-text">Hint was: {result.hint}</p>
+                  <p className="helper-text">คำใบ้คือ: {result.hint}</p>
                   <div className="action-cluster">
                     <button
                       className="primary-button compact-button"
                       onClick={handleNextRound}
                       disabled={!canReplay || busyAction !== ''}
                     >
-                      {busyAction === 'Starting next round'
-                        ? 'Starting...'
+                      {busyAction === 'กำลังเริ่มรอบถัดไป'
+                        ? 'กำลังเริ่ม...'
                         : isHost
-                          ? 'Play Next Round'
-                          : 'Waiting for Host'}
+                          ? 'เล่นรอบถัดไป'
+                          : 'กำลังรอหัวหน้าห้อง'}
                     </button>
                     <button className="secondary-button compact-button" onClick={handleLeaveRoom} disabled={busyAction !== ''}>
-                      Leave Room
+                      ออกจากห้อง
                     </button>
                   </div>
                 </div>
@@ -489,10 +489,10 @@ function App() {
             <section className="card">
               <div className="section-heading">
                 <div>
-                  <p className="mini-label">Agents</p>
-                  <h2>Player List</h2>
+                  <p className="mini-label">เอเจนต์</p>
+                  <h2>รายชื่อผู้เล่น</h2>
                 </div>
-                <span className="status-pill ghost">{players.length} in room</span>
+                <span className="status-pill ghost">{players.length} คนในห้อง</span>
               </div>
 
               <div className="player-list">
@@ -516,10 +516,10 @@ function App() {
                     >
                       <span>{player.name}</span>
                       <small>
-                        {player.isHost ? 'Host' : 'Player'}
-                        {isSelf ? ' / You' : ''}
-                        {!player.connected ? ' / Reconnecting' : ''}
-                        {phase === 'voting' && hasVoted ? ' / Voted' : ''}
+                        {player.isHost ? 'หัวหน้าห้อง' : 'ผู้เล่น'}
+                        {isSelf ? ' / คุณ' : ''}
+                        {!player.connected ? ' / กำลังเชื่อมต่อใหม่' : ''}
+                        {phase === 'voting' && hasVoted ? ' / ลงคะแนนแล้ว' : ''}
                         {phase === 'result' && revealRole ? ` / ${revealRole.role}` : ''}
                       </small>
                     </button>
@@ -529,13 +529,13 @@ function App() {
 
               {phase === 'voting' && isHost && (
                 <button className="secondary-button" onClick={handleRevealEarly} disabled={busyAction !== ''}>
-                  Reveal Early
+                  เฉลยทันที
                 </button>
               )}
 
               {phase !== 'result' && (
                 <button className="ghost-button" onClick={handleLeaveRoom} disabled={busyAction !== ''}>
-                  Leave Room
+                  ออกจากห้อง
                 </button>
               )}
             </section>
@@ -543,12 +543,12 @@ function App() {
             <section className="card chat-card">
               <div className="section-heading">
                 <div>
-                  <p className="mini-label">Room Feed</p>
-                  <h2>Chat</h2>
+                  <p className="mini-label">ฟีดห้อง</p>
+                  <h2>แชต</h2>
                 </div>
                 {me && (
                   <span className="status-pill ghost">
-                    {me.connected ? 'Connected' : 'Reconnecting'}
+                    {me.connected ? 'เชื่อมต่ออยู่' : 'กำลังเชื่อมต่อใหม่'}
                   </span>
                 )}
               </div>
@@ -588,12 +588,12 @@ function App() {
                   className="input"
                   value={chatMessage}
                   onChange={(event) => setChatMessage(event.target.value)}
-                  placeholder={phase === 'chat' ? 'Drop suspicion into the room...' : 'Chat opens during interrogation'}
+                  placeholder={phase === 'chat' ? 'ส่งความสงสัยเข้าไปในห้อง...' : 'แชตจะเปิดในช่วงสอบสวน'}
                   disabled={phase !== 'chat' || busyAction !== ''}
                   maxLength={180}
                 />
                 <button className="primary-button" type="submit" disabled={phase !== 'chat' || busyAction !== ''}>
-                  Send
+                  ส่ง
                 </button>
               </form>
             </section>
@@ -606,15 +606,15 @@ function App() {
           <div className="guess-modal" onClick={(event) => event.stopPropagation()}>
             <div className="section-heading modal-heading">
               <div>
-                <p className="mini-label">Spy Guess</p>
-                <h2>Pick The Hidden Location</h2>
+                <p className="mini-label">การทายของสปาย</p>
+                <h2>เลือกสถานที่ที่ซ่อนอยู่</h2>
               </div>
               <button className="close-button" onClick={() => setGuessModalOpen(false)}>
-                Close
+                ปิด
               </button>
             </div>
             <p className="helper-text">
-              One shot only. A correct guess wins the round immediately. A wrong guess locks this button for the rest of the round.
+              มีสิทธิ์เพียงครั้งเดียว ทายถูกจะชนะรอบทันที ทายผิดปุ่มนี้จะถูกล็อกตลอดรอบที่เหลือ
             </p>
             <div className="location-grid">
               {(privateRole?.locationOptions || roomState?.availableLocations || []).map((location) => (
