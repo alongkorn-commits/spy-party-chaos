@@ -477,14 +477,12 @@ app.use(express.json())
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, rooms: rooms.size })
 })
-
-if (process.env.NODE_ENV === 'production') {
-  app.use(express.static(distPath))
-
-  app.get('/', (_req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'))
+app.get('/', (_req, res) => {
+  res.json({
+    ok: true,
+    message: 'Spy Party API Running'
   })
-}
+})
 
 io.on('connection', (socket) => {
   socket.data.sessionId = socket.handshake.auth?.sessionId || randomId('session')
